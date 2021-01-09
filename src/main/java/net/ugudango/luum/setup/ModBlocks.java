@@ -7,7 +7,9 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.fml.RegistryObject;
+import net.ugudango.luum.blocks.CustomCarpet;
 import net.ugudango.luum.blocks.FloorLoom;
 
 import java.util.function.Supplier;
@@ -15,6 +17,9 @@ import java.util.function.Supplier;
 public class ModBlocks {
     public static final RegistryObject<FloorLoom> FLOOR_LOOM = register("floor_loom", () ->
             new FloorLoom(AbstractBlock.Properties.create(Material.WOOD).hardnessAndResistance(2,10).harvestLevel(2).sound(SoundType.WOOD)));
+
+    public static final RegistryObject<CustomCarpet> CUSTOM_CARPET = register("custom_carpet", () ->
+            new CustomCarpet(AbstractBlock.Properties.create(Material.CARPET).hardnessAndResistance(0.8f).sound(SoundType.CLOTH)));
 
     public static void register() {}
 
