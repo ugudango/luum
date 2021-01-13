@@ -3,6 +3,7 @@ package net.ugudango.luum.blocks;
 import com.google.common.collect.ImmutableList;
 import com.sun.javafx.geom.Vec3d;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.HorizontalBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderType;
@@ -17,11 +18,13 @@ import net.minecraft.item.DyeColor;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.pipeline.BakedQuadBuilder;
 import net.ugudango.luum.Luum;
+import net.ugudango.luum.utils.LuumVector3D;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -136,18 +139,36 @@ public class CustomCarpetBakedModel implements IDynamicBakedModel {
 
         RenderType layer = MinecraftForgeClient.getRenderLayer();
 
+        if (side != null || (layer != null && !layer.equals(RenderType.getSolid()))) {
+            return Collections.emptyList();
+        }
 
+        LuumVector3D.R rotation = LuumVector3D.R.DEG0;
 
-//        if (side != null || (layer != null && !layer.equals(RenderType.getSolid()))) {
-//            return Collections.emptyList();
-//        }
+        BlockState carpetBlockState = extraData.getData(CustomCarpetTile.CARPET_BLOCK_STATE);
+        Direction dir;
+        try {
+            dir = carpetBlockState.get(HorizontalBlock.HORIZONTAL_FACING);
+        } catch (Exception e) {
+            dir = Direction.NORTH;
+        }
+        switch (dir) {
+            case NORTH:
+                rotation = LuumVector3D.R.DEG180;
+                break;
+            case EAST:
+                rotation = LuumVector3D.R.DEG90;
+                break;
+            case WEST:
+                rotation = LuumVector3D.R.DEG270;
+                break;
+        }
 
         int[] colors = extraData.getData(CustomCarpetTile.COLORS);
-
         List<TextureAtlasSprite> textures = new ArrayList<TextureAtlasSprite>();
-
         List<BakedQuad> quads = new ArrayList<>();
-        final float carpetHeight = 1.0f / 16.0f;
+
+        final double carpetHeight = 1.0d / 16.0d;
         final int increment = 8;
         final int numberOfQuads = 256 / (increment * increment);
         Vector3d currentUpLeft = v (0, 1, 0);
@@ -166,13 +187,30 @@ public class CustomCarpetBakedModel implements IDynamicBakedModel {
         /**
          * TODO: Add orientation. Redo the calculations for 1/16 for a pixel.
          */
+
         for (int currentQuad = 0; currentQuad < numberOfQuads; currentQuad++ ) {
-            float topLeftX = (float) ((float) increment * ((float) (currentQuad % (16.0 / increment + 1.0)) /(float) (16.0 / increment)) / 16.0f);
-            float topLeftZ = (float) (increment * (currentQuad % (16.0 / increment)) / 16.0f);
-            Vector3d tl = v(topLeftX, carpetHeight, topLeftZ);
-            Vector3d tr = v(topLeftX + increment / 16.0f, carpetHeight, topLeftZ);
-            Vector3d bl = v(topLeftX, carpetHeight, topLeftZ + increment / 16.0f);
-            Vector3d br = v(topLeftX + increment / 16.0f, carpetHeight, topLeftZ + increment / 16.0f);
+            int i_tlx = (currentQuad * increment) % 16;
+            int i_tlz = ((currentQuad * increment) / 16) * increment;
+            LuumVector3D tl = new LuumVector3D(
+                    (double) i_tlx / 16.0d,
+                    carpetHeight,
+                    (double) i_tlz / 16.0d
+            ).rotateAxisY(rotation);
+            LuumVector3D tr = new LuumVector3D(
+                    (double) (i_tlx + increment) / 16.0d,
+                    carpetHeight,
+                    (double) i_tlz / 16.0d
+            ).rotateAxisY(rotation);;
+            LuumVector3D bl = new LuumVector3D(
+                    (double) i_tlx / 16.0d,
+                    carpetHeight,
+                    (double) (i_tlz + increment) / 16.0d
+            ).rotateAxisY(rotation);;
+            LuumVector3D br = new LuumVector3D(
+                    (double) (i_tlx + increment) / 16.0d,
+                    carpetHeight,
+                    (double) (i_tlz + increment) / 16.0d
+            ).rotateAxisY(rotation);;
             quads.add(createQuad(tl, bl, br, tr, textures.get(currentQuad)));
         }
 

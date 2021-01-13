@@ -22,8 +22,14 @@ import java.util.Objects;
 public class CustomCarpetTile extends TileEntity {
 
     public static final ModelProperty<int[]> COLORS = new ModelProperty<>();
+    public static final ModelProperty<BlockState> CARPET_BLOCK_STATE = new ModelProperty<>();
 
-    int[] colors = {1, 3, 4, 11};
+    private int[] colors = {1, 3, 4, 11};
+    private BlockState carpetBlockState;
+
+    public void setCarpetBlockState(BlockState carpetBlockState) {
+        this.carpetBlockState = carpetBlockState;
+    }
 
     public CustomCarpetTile() {
         super(ModTiles.CUSTOM_CARPET.get());
@@ -34,6 +40,7 @@ public class CustomCarpetTile extends TileEntity {
     public IModelData getModelData() {
         return new ModelDataMap.Builder()
                 .withInitial(COLORS, colors)
+                .withInitial(CARPET_BLOCK_STATE, carpetBlockState)
                 .build();
     }
 
@@ -42,6 +49,9 @@ public class CustomCarpetTile extends TileEntity {
         CompoundNBT tag = super.getUpdateTag();
         if (colors != null) {
             tag.putIntArray("colors", colors);
+        }
+        if (carpetBlockState != null) {
+            tag.put("carpet_block_state", NBTUtil.writeBlockState(carpetBlockState));
         }
         return tag;
     }
@@ -59,10 +69,13 @@ public class CustomCarpetTile extends TileEntity {
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+
         int[] oldColors = colors;
+        BlockState oldBlockState = carpetBlockState;
         CompoundNBT tag = pkt.getNbtCompound();
         handleUpdateTag(getBlockState(), tag);
-        if (!Objects.equals(oldColors, colors)) {
+        if (!Objects.equals(oldColors, colors)
+           || !Objects.equals(oldBlockState, carpetBlockState)) {
             ModelDataManager.requestModelDataRefresh(this);
             world.notifyBlockUpdate(pos, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
         }
@@ -77,12 +90,18 @@ public class CustomCarpetTile extends TileEntity {
              */
             colors = nbt.getIntArray("colors");
         }
+        if (nbt.contains("carpet_block_state")) {
+            carpetBlockState = NBTUtil.readBlockState(nbt.getCompound("carpet_block_state"));
+        }
     }
 
     @Override
     public CompoundNBT write(CompoundNBT tag) {
         if (colors != null) {
             tag.putIntArray("colors", colors);
+        }
+        if (carpetBlockState != null) {
+            tag.put("carpet_block_state", NBTUtil.writeBlockState(carpetBlockState));
         }
         return super.write(tag);
     }
