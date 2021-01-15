@@ -1,8 +1,11 @@
-package net.ugudango.luum.blocks;
+package net.ugudango.luum.blocks.custom_carpet;
 
 import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Mirror;
@@ -12,10 +15,10 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomCarpet extends Block {
     private final VoxelShape shape = VoxelShapes.create(0, 0, 0, 1, 1.0f / 16.0f, 1);
@@ -46,11 +49,6 @@ public class CustomCarpet extends Block {
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        builder.add(HorizontalBlock.HORIZONTAL_FACING);
-    }
-
-    @Override
     public boolean hasTileEntity(BlockState state) {
         return true;
     }
@@ -59,7 +57,32 @@ public class CustomCarpet extends Block {
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         CustomCarpetTile cct = new CustomCarpetTile();
-        cct.setCarpetBlockState(state);
         return cct;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+        TileEntity tileEntity = builder.get(LootParameters.BLOCK_ENTITY);
+        if(tileEntity instanceof CustomCarpetTile) {
+            final List<ItemStack> drops = new ArrayList<>();
+            ItemStack stack = new ItemStack(this);
+
+            CompoundNBT tag = new CompoundNBT();
+            ((CustomCarpetTile)tileEntity).write(tag);
+
+            stack.setTagInfo("BlockEntityTag", tag);
+            drops.add(stack);
+
+            return drops;
+        }
+        else {
+            return super.getDrops(state, builder);
+        }
+    }
+
+    @Override
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+        builder.add(HorizontalBlock.HORIZONTAL_FACING);
     }
 }

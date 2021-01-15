@@ -7,10 +7,9 @@ import net.minecraft.block.material.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
-import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.fml.RegistryObject;
-import net.ugudango.luum.blocks.CustomCarpet;
-import net.ugudango.luum.blocks.FloorLoom;
+import net.ugudango.luum.blocks.custom_carpet.CustomCarpet;
+import net.ugudango.luum.blocks.floor_loom.FloorLoom;
 
 import java.util.function.Supplier;
 

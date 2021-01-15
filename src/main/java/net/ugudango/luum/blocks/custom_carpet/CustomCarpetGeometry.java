@@ -1,4 +1,4 @@
-package net.ugudango.luum.blocks;
+package net.ugudango.luum.blocks.custom_carpet;
 
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.renderer.model.*;
@@ -7,8 +7,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
-import net.minecraftforge.client.model.geometry.IModelGeometryPart;
-import org.jline.utils.Log;
 
 import java.util.*;
 import java.util.function.Function;

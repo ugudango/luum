@@ -1,4 +1,4 @@
-package net.ugudango.luum.blocks;
+package net.ugudango.luum.blocks.custom_carpet;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
